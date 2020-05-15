@@ -4,38 +4,32 @@ Usage:
     from awesome_print import ap
     ap(object)
 """
-import __builtin__
 from types import *
 
 mode = 'ansi'
 
 def ap(*args):
     for arg in args:
-        print format(arg)
+        print(format(arg))
 
 def indent(level):
     return '  ' * level
 
 def format(obj, level = 0):
-    type = __builtin__.type(obj)
-
-    if type is NoneType:
+    if isinstance(obj, type(None)):
         return red('None')
 
-    if type is TypeType:
-        pass
-
-    if type is BooleanType:
+    if isinstance(obj, bool):
         return green(str(obj))
 
-    if type in [StringType, UnicodeType]:
+    if isinstance(obj, str):
         return yellow(str(obj))
 
-    if type in [IntType, LongType, FloatType, ComplexType]:
+    if any([isinstance(obj, t) for t in [int, float, complex]]):
         return bold_blue(str(obj))
 
-    if type in (TupleType, ListType):
-        open, close = ('(', ')') if type is TupleType else ('[', ']')
+    if any([isinstance(obj, t) for t in [tuple, list]]):
+        open, close = ('(', ')') if isinstance(obj, tuple) else ('[', ']')
         if len(obj) is 0:
             return open + close
 
@@ -51,13 +45,13 @@ def format(obj, level = 0):
                         ",\n".join(s) + \
                "\n" + indent(level) + close
 
-    if type is DictType:
+    if isinstance(obj, dict):
         if len(obj) is 0:
             return '{}'
 
-        width = str(max([flen(format(k)) for k in obj.keys()]))
+        width = str(max([flen(format(k)) for k in list(obj.keys())]))
         s = []
-        for k in obj.keys():
+        for k in list(obj.keys()):
             v = obj[k]
             s.append(('%s%' + width + 's: %s') % \
                     (indent(level + 1), format(k), format(v, level + 1)))
